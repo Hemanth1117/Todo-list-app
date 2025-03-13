@@ -7,16 +7,26 @@ function addTask() {
 
     let taskList = document.getElementById("taskList");
     let li = document.createElement("li");
-
+    
     li.innerHTML = `
         <span onclick="toggleTask(this)">${taskText}</span>
-        <button onclick="deleteTask(this)">❌</button>
+        <button class="delete-btn" onclick="deleteTask(this)">❌</button>
     `;
 
     taskList.appendChild(li);
+    animateTask(li); // Smooth animation
+
     saveTasks();
-    taskInput.value = "";
+    taskInput.value = "";  // Clear input
+    taskInput.focus();  // Auto-focus for faster input
 }
+
+// Enter key event for quick task addition
+document.getElementById("taskInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        addTask();
+    }
+});
 
 function toggleTask(taskElement) {
     taskElement.classList.toggle("completed");
@@ -24,8 +34,12 @@ function toggleTask(taskElement) {
 }
 
 function deleteTask(button) {
-    button.parentElement.remove();
-    saveTasks();
+    let task = button.parentElement;
+    task.classList.add("fade-out"); // Animation before removal
+    setTimeout(() => {
+        task.remove();
+        saveTasks();
+    }, 300);
 }
 
 function saveTasks() {
@@ -47,8 +61,17 @@ function loadTasks() {
         let li = document.createElement("li");
         li.innerHTML = `
             <span onclick="toggleTask(this)" class="${task.completed ? 'completed' : ''}">${task.text}</span>
-            <button onclick="deleteTask(this)">❌</button>
+            <button class="delete-btn" onclick="deleteTask(this)">❌</button>
         `;
         taskList.appendChild(li);
     });
+}
+
+// Smooth fade-in animation when adding tasks
+function animateTask(taskElement) {
+    taskElement.style.opacity = "0";
+    setTimeout(() => {
+        taskElement.style.opacity = "1";
+        taskElement.style.transition = "opacity 0.3s ease-in-out";
+    }, 10);
 }
